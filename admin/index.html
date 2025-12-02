@@ -97,8 +97,21 @@
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="dashboard-grid">
+                <!-- Empty State (shown when no properties/inquiries) -->
+                <div class="empty-state-dashboard hidden" id="dashboardEmptyState">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏠</div>
+                        <h3 class="empty-state-title">Welcome to Real Estate Simplified!</h3>
+                        <p>No properties yet. Add properties to start receiving customer inquiries.</p>
+                        <div class="empty-state-actions">
+                            <button class="btn btn-primary btn-lg" onclick="showAddPropertyModal()">+ Add Property</button>
+                            <button class="btn btn-secondary btn-lg" onclick="loadSampleData()">📦 Load Sample Data (for testing)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity (hidden when empty) -->
+                <div class="dashboard-grid" id="dashboardActivity">
                     <div class="card">
                         <div class="card-header">
                             <h3>Recent Inquiries</h3>
@@ -115,6 +128,20 @@
                         </div>
                         <div class="card-body">
                             <div id="upcomingAppointments"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management Actions -->
+                <div class="card mt-4" id="dataManagementCard">
+                    <div class="card-header">
+                        <h3>📦 Data Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Manage test data for the application.</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-secondary" onclick="loadSampleData()">📦 Load Sample Data</button>
+                            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
                         </div>
                     </div>
                 </div>
@@ -503,6 +530,7 @@
     <script src="../shared/auth.js"></script>
     <script src="../shared/utils.js"></script>
     <script src="../data/seed.js"></script>
+    <script src="../data/sample-data.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

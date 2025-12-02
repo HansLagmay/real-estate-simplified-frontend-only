@@ -464,6 +464,27 @@
     color: var(--gray-500);
 }
 
+/* Empty State Dashboard */
+.empty-state-dashboard {
+    margin-top: var(--spacing-xl);
+}
+
+.empty-state-dashboard .empty-state {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .dashboard-grid {

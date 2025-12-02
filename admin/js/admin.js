@@ -18,7 +18,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Setup navigation
     setupNavigation();
+
+    // Setup real-time sync across browser tabs
+    setupStorageSync();
 });
+
+// Real-time sync across browser tabs
+function setupStorageSync() {
+    window.addEventListener('storage', (e) => {
+        if (e.key && e.key.startsWith('realestate_')) {
+            console.log('📡 Data updated in another tab, refreshing...');
+            refreshCurrentPage();
+        }
+    });
+}
+
+function refreshCurrentPage() {
+    const hash = window.location.hash.slice(1) || 'dashboard';
+    navigateToPage(hash);
+}
 
 // Authentication
 function checkAuth() {
@@ -65,7 +83,7 @@ function logout() {
 function showApp() {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appContainer').classList.remove('hidden');
-    document.getElementById('currentUserName').textContent = currentUser.name;
+    document.getElementById('currentUserName').textContent = currentUser.name || currentUser.firstName + ' ' + currentUser.lastName;
     
     // Load initial data
     loadDashboard();
@@ -150,12 +168,26 @@ function loadDashboard() {
     document.getElementById('statPendingInquiries').textContent = inquiries.filter(i => i.status === 'pending').length;
     document.getElementById('statUpcomingAppointments').textContent = appointments.filter(a => a.status === 'scheduled').length;
 
+    // Show/hide empty state based on data
+    const emptyState = document.getElementById('dashboardEmptyState');
+    const activitySection = document.getElementById('dashboardActivity');
+    
+    if (properties.length === 0 && inquiries.length === 0) {
+        // Show empty state
+        if (emptyState) emptyState.classList.remove('hidden');
+        if (activitySection) activitySection.classList.add('hidden');
+    } else {
+        // Hide empty state
+        if (emptyState) emptyState.classList.add('hidden');
+        if (activitySection) activitySection.classList.remove('hidden');
+    }
+
     // Load recent inquiries
     const recentInquiries = inquiries.slice(-5).reverse();
     const inquiriesContainer = document.getElementById('recentInquiries');
     
     if (recentInquiries.length === 0) {
-        inquiriesContainer.innerHTML = '<p class="empty-list">No recent inquiries</p>';
+        inquiriesContainer.innerHTML = '<p class="empty-list">No inquiries yet. Add properties to get started.</p>';
     } else {
         inquiriesContainer.innerHTML = recentInquiries.map(inquiry => {
             const property = Storage.getPropertyById(inquiry.propertyId);
@@ -199,7 +231,7 @@ function loadDashboard() {
                             ${Utils.formatDateShort(apt.date)} at ${Utils.formatTime(apt.time)}
                         </div>
                         <div class="activity-meta">
-                            Agent: ${agent ? Utils.sanitizeHTML(agent.name) : 'Unassigned'}
+                            Agent: ${agent ? Utils.sanitizeHTML(agent.name || (agent.firstName + ' ' + agent.lastName)) : 'Unassigned'}
                         </div>
                     </div>
                 </div>
@@ -889,7 +921,7 @@ function exportSalesCSV() {
             'Buyer Name': sale.buyerName,
             'Buyer Email': sale.buyerEmail,
             'Buyer Phone': sale.buyerPhone,
-            Agent: agent ? agent.name : 'Unknown',
+            Agent: agent ? (agent.name || agent.firstName + ' ' + agent.lastName) : 'Unknown',
             Price: sale.price,
             Commission: sale.commission || 0,
             Notes: sale.notes || ''
@@ -911,4 +943,33 @@ function exportSalesCSV() {
     const csv = Utils.generateCSV(csvData, columns);
     Utils.downloadCSV(csv, `sales-report-${Utils.getTodayDate()}.csv`);
     Utils.showNotification('Sales report exported successfully', 'success');
+}
+
+// Sample Data Management
+function loadSampleData() {
+    if (typeof SampleData !== 'undefined' && SampleData.load) {
+        if (SampleData.load()) {
+            Utils.showNotification('✅ Sample data loaded successfully!', 'success');
+            loadDashboard();
+            location.reload();
+        }
+    } else {
+        Utils.showNotification('Sample data module not loaded', 'danger');
+    }
+}
+
+function clearAllData() {
+    if (!confirm('⚠️ Clear ALL data? This will remove all properties, inquiries, appointments, and sales. This cannot be undone!')) {
+        return;
+    }
+    
+    // Clear all data except users
+    localStorage.setItem('realestate_properties', JSON.stringify([]));
+    localStorage.setItem('realestate_inquiries', JSON.stringify([]));
+    localStorage.setItem('realestate_appointments', JSON.stringify([]));
+    localStorage.setItem('realestate_sales', JSON.stringify([]));
+    localStorage.setItem('realestate_photos', JSON.stringify([]));
+    
+    Utils.showNotification('🗑️ All data cleared successfully!', 'success');
+    location.reload();
 }

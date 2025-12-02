@@ -17,7 +17,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Setup navigation
     setupNavigation();
+
+    // Setup real-time sync across browser tabs
+    setupStorageSync();
 });
+
+// Real-time sync across browser tabs
+function setupStorageSync() {
+    window.addEventListener('storage', (e) => {
+        if (e.key && e.key.startsWith('realestate_')) {
+            console.log('📡 Data updated in another tab, refreshing...');
+            refreshCurrentPage();
+        }
+    });
+}
+
+function refreshCurrentPage() {
+    const hash = window.location.hash.slice(1) || 'dashboard';
+    navigateToPage(hash);
+}
 
 // Authentication
 function checkAuth() {
@@ -64,7 +82,7 @@ function logout() {
 function showApp() {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appContainer').classList.remove('hidden');
-    document.getElementById('currentUserName').textContent = currentUser.name;
+    document.getElementById('currentUserName').textContent = currentUser.name || (currentUser.firstName + ' ' + currentUser.lastName);
     
     // Load initial data
     loadDashboard();
@@ -150,7 +168,12 @@ function loadDashboard() {
     const inquiriesContainer = document.getElementById('recentInquiries');
     
     if (recentInquiries.length === 0) {
-        inquiriesContainer.innerHTML = '<p class="empty-list">No inquiries assigned to you</p>';
+        inquiriesContainer.innerHTML = `
+            <div class="empty-list">
+                <p>No Assigned Inquiries</p>
+                <small>When admin assigns inquiries to you, they'll appear here.</small>
+            </div>
+        `;
     } else {
         inquiriesContainer.innerHTML = recentInquiries.map(inquiry => {
             const property = Storage.getPropertyById(inquiry.propertyId);
@@ -204,7 +227,16 @@ function loadInquiries() {
     const tableBody = document.getElementById('inquiriesTable');
     
     if (myInquiries.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No inquiries assigned to you</td></tr>';
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">
+                    <div class="empty-list">
+                        <p>No Assigned Inquiries</p>
+                        <small>When admin assigns inquiries to you, they'll appear here.</small>
+                    </div>
+                </td>
+            </tr>
+        `;
         return;
     }
 

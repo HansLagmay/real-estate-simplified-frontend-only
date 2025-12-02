@@ -1,29 +1,59 @@
-# Real Estate Simplified - Frontend-Only Platform
+# Real Estate Simplified - Frontend-Only Testing Version
 
 A complete real estate management platform with three portals (Customer, Admin, Agent) built entirely with HTML, CSS, and JavaScript using localStorage for data persistence.
 
+## ✨ Key Features
+
+- **Empty System on First Load** - Only user accounts are preset, everything else starts empty
+- **Real-time Sync Across Browser Tabs** - Changes in one tab instantly appear in other tabs
+- **Shared Calendar with Conflict Detection** - All agents see all appointments, prevents double-booking
+- **Priority System Per Property** - Auto-calculates and recalculates priorities when inquiries change
+- **Photo Upload (Base64)** - Upload and manage property photos stored in localStorage
+- **Optional Sample Data** - Load test data with one click for testing purposes
+
 ## 📋 Overview
 
-### Purpose
-This is a **frontend-only demonstration** of a real estate management system. It showcases how a complete real estate platform works without requiring a backend server. All data is stored in the browser's localStorage.
+### Initial State: EMPTY
+
+The system starts completely empty with only user accounts for login:
+
+```javascript
+// Only preset: User accounts for login
+users = [
+  { id: 1, email: 'admin@company.com', password: 'admin123', role: 'admin', firstName: 'Admin', lastName: 'User' },
+  { id: 2, email: 'agent1@company.com', password: 'agent123', role: 'agent', firstName: 'Carlos', lastName: 'Reyes' },
+  { id: 3, email: 'agent2@company.com', password: 'agent123', role: 'agent', firstName: 'Maria', lastName: 'Lopez' },
+  { id: 4, email: 'agent3@company.com', password: 'agent123', role: 'agent', firstName: 'Ana', lastName: 'Garcia' }
+];
+
+// Everything else empty:
+properties = []
+appointments = []
+inquiries = []
+photos = {}
+```
 
 ### What Works
-- ✅ Property browsing and searching
-- ✅ Property detail pages with image galleries
-- ✅ Customer inquiry submission
-- ✅ Admin dashboard with statistics
-- ✅ Inquiry assignment to agents
-- ✅ Shared calendar across all agents
-- ✅ Appointment scheduling with conflict detection
-- ✅ Property CRUD operations
-- ✅ Photo upload (base64 in localStorage)
-- ✅ Mark properties as sold
-- ✅ Sales reports with CSV export
-- ✅ Agent management
-- ✅ Priority system for inquiries
-
-### Limitations
-This is a frontend-only demo - see [Limitations](#-limitations) section for details on what differs from a full-stack implementation.
+- ✅ Empty system on first load (only user accounts)
+- ✅ Admin can add properties manually
+- ✅ Properties appear in customer portal immediately
+- ✅ Customer can submit inquiries
+- ✅ Inquiries appear in admin portal immediately
+- ✅ Admin can assign to agents with workload display
+- ✅ Agent sees assigned inquiries immediately
+- ✅ Shared calendar works (all agents see all appointments)
+- ✅ Conflict detection prevents double-booking
+- ✅ Priority system auto-calculates and recalculates per property
+- ✅ Photo upload works (base64 in localStorage)
+- ✅ Mark as sold works
+- ✅ My Sales shows correct data
+- ✅ CSV export works
+- ✅ Real-time sync across browser tabs
+- ✅ Empty state UI with helpful messages
+- ✅ Load Sample Data button (optional)
+- ✅ Clear all data button
+- ✅ Mobile responsive
+- ✅ Professional UI
 
 ---
 
@@ -31,8 +61,8 @@ This is a frontend-only demo - see [Limitations](#-limitations) section for deta
 
 ### Option 1: Direct File Opening
 1. Clone or download this repository
-2. Open `index.html` in your browser
-3. You'll be redirected to the Customer Portal
+2. Open `customer/index.html` in your browser
+3. The system starts EMPTY - no properties, no inquiries
 
 ### Option 2: Local Server (Recommended)
 ```bash
@@ -45,14 +75,19 @@ npx serve
 # Using PHP
 php -S localhost:8080
 ```
-Then open `http://localhost:8080` in your browser.
+Then open `http://localhost:8080/customer/index.html` in your browser.
+
+### Load Sample Data (Optional)
+1. Login to Admin Portal
+2. Click "📦 Load Sample Data" button on the dashboard
+3. Confirm the dialog
+4. 15 properties and 10 inquiries will be loaded
 
 ### Reset Data
-To reset all data to seed values, open the browser console (F12) and run:
-```javascript
-SeedData.init(true);
-location.reload();
-```
+To clear all data and start fresh:
+1. Login to Admin Portal
+2. Click "🗑️ Clear All Data" button
+3. Or run in console: `SeedData.init(true); location.reload();`
 
 ---
 
@@ -66,9 +101,9 @@ location.reload();
 ### Agent Portal
 | Agent | Email | Password |
 |-------|-------|----------|
-| Sarah Johnson | agent1@company.com | agent123 |
-| Michael Chen | agent2@company.com | agent123 |
-| Emily Davis | agent3@company.com | agent123 |
+| Carlos Reyes | agent1@company.com | agent123 |
+| Maria Lopez | agent2@company.com | agent123 |
+| Ana Garcia | agent3@company.com | agent123 |
 
 ---
 
@@ -79,6 +114,90 @@ location.reload();
 | Customer | `/customer/index.html` | Browse properties, submit inquiries |
 | Admin | `/admin/index.html` | Manage everything |
 | Agent | `/agent/index.html` | View assigned work, schedule viewings |
+
+---
+
+## 🧪 Manual Testing Guide
+
+### Test 1: Add Property Flow
+1. Open admin portal: `admin@company.com` / `admin123`
+2. Click "Add Property"
+3. Fill in: Title, Price, Bedrooms, Address, City
+4. Upload 2-3 photos
+5. Click "Save"
+6. ✅ Verify: Property appears in list
+7. Open customer portal (new tab)
+8. ✅ Verify: Property appears in listings
+9. Click property
+10. ✅ Verify: All details + photos display correctly
+
+### Test 2: Inquiry Flow
+1. Customer portal: Click property
+2. Click "Send Inquiry"
+3. Fill in: Name, Phone, Email, Message
+4. Submit
+5. ✅ Verify: Success message appears
+6. Admin portal: Check dashboard
+7. ✅ Verify: "Pending Inquiries" counter updated
+8. Click "Inquiries" tab
+9. ✅ Verify: New inquiry listed with Priority #1
+
+### Test 3: Assignment Flow
+1. Admin: Click "Assign" on inquiry
+2. ✅ Verify: Agent list displayed
+3. Select agent: Maria Lopez
+4. Click "Assign"
+5. ✅ Verify: Inquiry status changes to "Assigned"
+6. Open agent portal: `agent2@company.com` / `agent123`
+7. ✅ Verify: Inquiry appears in "My Inquiries"
+8. ✅ Verify: Customer contact info visible
+
+### Test 4: Calendar Conflict Detection
+1. Agent (Maria): Click "Schedule" on an inquiry
+2. Select: Tomorrow @ 2:00 PM
+3. Click "Schedule"
+4. ✅ Verify: Appears in calendar
+5. Open another agent portal: `agent1@company.com`
+6. ✅ Verify: Maria's appointment visible in calendar
+7. Try to schedule same property, same date/time
+8. ✅ Verify: Error "Time conflict!"
+9. Select different time: 4:00 PM
+10. ✅ Verify: Schedules successfully
+
+### Test 5: Priority Recalculation
+1. Customer submits inquiry for Property A (Priority #1)
+2. Another customer submits inquiry for Property A (Priority #2)
+3. Third customer submits inquiry for Property A (Priority #3)
+4. Admin cancels Priority #1 inquiry (or marks completed)
+5. ✅ Verify: Priority #2 becomes #1
+6. ✅ Verify: Priority #3 becomes #2
+
+### Test 6: Complete Sale Flow
+1. Agent marks viewing as completed
+2. Admin: Opens property
+3. Click "Mark as Sold"
+4. Enter: Sale price, Sale date, Buyer name
+5. Select: Sold by Maria Lopez
+6. Click "Save"
+7. ✅ Verify: Property status = "Sold"
+8. Agent (Maria): Open "My Sales"
+9. ✅ Verify: Sale appears with all details
+
+### Test 7: Real-time Sync Across Tabs
+1. Open Admin portal in Tab 1
+2. Open Customer portal in Tab 2
+3. In Admin (Tab 1): Add a new property
+4. ✅ Verify: Property immediately appears in Customer (Tab 2)
+5. In Customer (Tab 2): Submit an inquiry
+6. ✅ Verify: Inquiry count updates in Admin (Tab 1)
+
+### Test 8: Sample Data Load/Clear
+1. Admin portal: Click "📦 Load Sample Data"
+2. Confirm dialog
+3. ✅ Verify: Properties and inquiries are loaded
+4. Click "🗑️ Clear All Data"
+5. Confirm dialog
+6. ✅ Verify: All properties, inquiries cleared, back to empty state
 
 ---
 
@@ -211,6 +330,23 @@ location.reload();
 
 ## ⚙️ How It Works
 
+### Real-time Sync Across Browser Tabs
+
+Changes in one tab are automatically detected and reflected in other tabs:
+
+```javascript
+// Storage event listener in all portals
+window.addEventListener('storage', (e) => {
+    if (e.key?.startsWith('realestate_')) {
+        console.log('📡 Data updated in another tab, refreshing...');
+        refreshCurrentPage();
+    }
+});
+
+// When admin adds property in Tab 1
+// → Customer portal in Tab 2 updates instantly
+```
+
 ### Data Storage (localStorage)
 
 All data is stored in the browser's localStorage using these keys:
@@ -249,26 +385,29 @@ function hasAppointmentConflict(propertyId, date, time, excludeId) {
 
 This prevents double-booking the same property at the same time, even across different agents.
 
-### Priority System
+### Priority System (Per Property)
 
-Inquiries are automatically assigned priorities based on creation order:
+Priorities are calculated PER PROPERTY, not globally. Each property has its own priority queue:
 
 ```javascript
-// New inquiry gets priority = pending count + 1
-function calculatePriority(inquiries) {
-    const pending = inquiries.filter(i => 
-        i.status === 'pending' || i.status === 'assigned'
+// Calculate priority for a specific property
+function calculatePriorityForProperty(inquiries, propertyId) {
+    const active = inquiries.filter(i => 
+        i.propertyId === propertyId &&
+        !['cancelled', 'completed'].includes(i.status)
     );
-    return pending.length + 1;
+    return active.length + 1;
 }
 
-// When inquiry is cancelled/completed, recalculate all
-function recalculatePriorities() {
-    const pending = inquiries
-        .filter(i => i.status === 'pending' || i.status === 'assigned')
+// When inquiry is cancelled/completed, recalculate for that property
+function recalculatePrioritiesForProperty(propertyId) {
+    const inquiries = getInquiries();
+    
+    const active = inquiries
+        .filter(i => i.propertyId === propertyId && !['cancelled', 'completed'].includes(i.status))
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     
-    pending.forEach((inq, index) => {
+    active.forEach((inq, index) => {
         inq.priority = index + 1;
     });
 }
@@ -453,7 +592,7 @@ function downloadCSV(content, filename) {
 3. **Photo Size**: Large photos may hit localStorage limits (~5MB)
 4. **Security**: All data is accessible via browser dev tools
 5. **No Notifications**: Cannot send emails or SMS
-6. **Single User**: Changes don't sync between browsers/tabs
+6. **Cross-Tab Sync**: Changes sync across tabs in the same browser only
 
 ---
 
@@ -490,12 +629,13 @@ function downloadCSV(content, filename) {
 │       └── agent.js          # All agent logic
 │
 ├── /shared                    # Shared modules
-│   ├── storage.js            # localStorage CRUD operations
+│   ├── storage.js            # localStorage CRUD with real-time sync
 │   ├── auth.js               # Authentication helpers
 │   └── utils.js              # Utility functions
 │
-├── /data                      # Seed data
-│   └── seed.js               # Initial data (15 properties, 4 users, etc.)
+├── /data                      # Data files
+│   ├── seed.js               # Initialize empty system + users
+│   └── sample-data.js        # Optional sample data (15 properties, 10 inquiries)
 │
 ├── /assets                    # Static assets
 │   ├── /css
