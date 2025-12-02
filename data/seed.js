@@ -89,7 +89,7 @@ const SeedData = {
         localStorage.setItem('realestate_inquiries', JSON.stringify([]));
         localStorage.setItem('realestate_appointments', JSON.stringify([]));
         localStorage.setItem('realestate_sales', JSON.stringify([]));
-        localStorage.setItem('realestate_photos', JSON.stringify({}));
+        localStorage.setItem('realestate_photos', JSON.stringify([]));
 
         console.log('✅ Empty system initialized successfully!');
         console.log('Users:', this.users.length);
@@ -121,7 +121,7 @@ const SeedData = {
         localStorage.setItem('realestate_inquiries', JSON.stringify([]));
         localStorage.setItem('realestate_appointments', JSON.stringify([]));
         localStorage.setItem('realestate_sales', JSON.stringify([]));
-        localStorage.setItem('realestate_photos', JSON.stringify({}));
+        localStorage.setItem('realestate_photos', JSON.stringify([]));
         
         console.log('✅ All data cleared!');
         return true;

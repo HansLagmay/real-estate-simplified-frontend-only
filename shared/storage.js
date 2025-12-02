@@ -389,7 +389,13 @@ const Storage = {
 
     // Photos
     getPhotos() {
-        return this.get(STORAGE_KEYS.PHOTOS) || [];
+        const photos = this.get(STORAGE_KEYS.PHOTOS);
+        // Handle case where photos was initialized as empty object {}
+        if (!photos || (typeof photos === 'object' && !Array.isArray(photos) && Object.keys(photos).length === 0)) {
+            return [];
+        }
+        // Ensure it's always an array
+        return Array.isArray(photos) ? photos : [];
     },
 
     setPhotos(photos) {
