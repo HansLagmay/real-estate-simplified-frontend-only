@@ -24,7 +24,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Setup real-time search
     setupSearch();
+
+    // Setup real-time sync across browser tabs
+    setupStorageSync();
 });
+
+// Real-time sync across browser tabs
+function setupStorageSync() {
+    window.addEventListener('storage', (e) => {
+        if (e.key && e.key.startsWith('realestate_')) {
+            console.log('📡 Data updated in another tab, refreshing...');
+            loadProperties();
+        }
+    });
+}
 
 function loadProperties() {
     allProperties = Storage.getProperties();
@@ -43,6 +56,20 @@ function displayProperties(properties) {
     if (properties.length === 0) {
         container.classList.add('hidden');
         emptyState.classList.remove('hidden');
+        // Update empty state message based on whether there are any properties at all
+        if (allProperties.length === 0) {
+            emptyState.innerHTML = `
+                <div class="empty-state-icon">🏠</div>
+                <h3 class="empty-state-title">No Properties Available Yet</h3>
+                <p>Check back soon for new listings!</p>
+            `;
+        } else {
+            emptyState.innerHTML = `
+                <div class="empty-state-icon">🔍</div>
+                <h3 class="empty-state-title">No properties found</h3>
+                <p>Try adjusting your filters or search terms</p>
+            `;
+        }
         return;
     }
 

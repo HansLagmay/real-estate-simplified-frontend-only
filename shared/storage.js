@@ -1,6 +1,7 @@
 /**
  * Storage Module
  * Handles all localStorage operations for the real estate platform
+ * Includes real-time sync across browser tabs
  */
 
 const STORAGE_KEYS = {
@@ -12,6 +13,47 @@ const STORAGE_KEYS = {
     SALES: 'realestate_sales',
     CURRENT_USER: 'realestate_current_user'
 };
+
+// Real-time sync across browser tabs
+const StorageSync = {
+    listeners: [],
+    
+    // Initialize storage event listener for cross-tab sync
+    init() {
+        window.addEventListener('storage', (e) => {
+            if (e.key && e.key.startsWith('realestate_')) {
+                console.log('📡 Storage updated in another tab:', e.key);
+                this.notifyListeners(e.key, e.newValue);
+            }
+        });
+    },
+    
+    // Add listener for storage changes
+    addListener(callback) {
+        this.listeners.push(callback);
+    },
+    
+    // Remove listener
+    removeListener(callback) {
+        this.listeners = this.listeners.filter(l => l !== callback);
+    },
+    
+    // Notify all listeners of changes
+    notifyListeners(key, newValue) {
+        this.listeners.forEach(callback => {
+            try {
+                callback(key, newValue);
+            } catch (e) {
+                console.error('Error in storage listener:', e);
+            }
+        });
+    }
+};
+
+// Initialize sync on load
+if (typeof window !== 'undefined') {
+    StorageSync.init();
+}
 
 const Storage = {
     // Generic CRUD operations
@@ -155,7 +197,8 @@ const Storage = {
         inquiry.id = this.generateId('inq');
         inquiry.createdAt = new Date().toISOString();
         inquiry.status = 'pending';
-        inquiry.priority = this.calculatePriority(inquiries);
+        // Calculate priority for this specific property
+        inquiry.priority = this.calculatePriorityForProperty(inquiries, inquiry.propertyId);
         inquiries.push(inquiry);
         this.setInquiries(inquiries);
         return inquiry;
@@ -165,8 +208,16 @@ const Storage = {
         const inquiries = this.getInquiries();
         const index = inquiries.findIndex(i => i.id === id);
         if (index !== -1) {
+            const oldStatus = inquiries[index].status;
             inquiries[index] = { ...inquiries[index], ...updates };
             this.setInquiries(inquiries);
+            
+            // Recalculate priorities if status changed to cancelled/completed
+            const newStatus = inquiries[index].status;
+            if (oldStatus !== newStatus && ['cancelled', 'completed'].includes(newStatus)) {
+                this.recalculatePrioritiesForProperty(inquiries[index].propertyId);
+            }
+            
             return inquiries[index];
         }
         return null;
@@ -174,17 +225,47 @@ const Storage = {
 
     deleteInquiry(id) {
         const inquiries = this.getInquiries();
+        const inquiry = inquiries.find(i => i.id === id);
+        const propertyId = inquiry ? inquiry.propertyId : null;
         const filtered = inquiries.filter(i => i.id !== id);
         this.setInquiries(filtered);
-        this.recalculatePriorities();
+        if (propertyId) {
+            this.recalculatePrioritiesForProperty(propertyId);
+        }
         return filtered.length !== inquiries.length;
     },
 
+    // Calculate priority for a specific property
+    calculatePriorityForProperty(inquiries, propertyId) {
+        const active = inquiries.filter(i => 
+            i.propertyId === propertyId &&
+            !['cancelled', 'completed'].includes(i.status)
+        );
+        return active.length + 1;
+    },
+
+    // Legacy: Calculate global priority
     calculatePriority(inquiries) {
         const pending = inquiries.filter(i => i.status === 'pending' || i.status === 'assigned');
         return pending.length + 1;
     },
 
+    // Recalculate priorities for a specific property
+    recalculatePrioritiesForProperty(propertyId) {
+        const inquiries = this.getInquiries();
+        
+        const active = inquiries
+            .filter(i => i.propertyId === propertyId && !['cancelled', 'completed'].includes(i.status))
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        
+        active.forEach((inq, index) => {
+            inq.priority = index + 1;
+        });
+        
+        this.setInquiries(inquiries);
+    },
+
+    // Legacy: Recalculate all priorities globally
     recalculatePriorities() {
         const inquiries = this.getInquiries();
         const pending = inquiries

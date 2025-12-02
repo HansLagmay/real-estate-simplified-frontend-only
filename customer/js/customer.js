@@ -16,7 +16,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Setup search
     setupSearch();
+
+    // Setup real-time sync across browser tabs
+    setupStorageSync();
 });
+
+// Real-time sync across browser tabs
+function setupStorageSync() {
+    window.addEventListener('storage', (e) => {
+        if (e.key && e.key.startsWith('realestate_')) {
+            console.log('📡 Data updated in another tab, refreshing...');
+            loadStats();
+            loadFeaturedProperties();
+        }
+    });
+}
 
 function loadStats() {
     const properties = Storage.getProperties();
@@ -33,6 +47,18 @@ function loadFeaturedProperties() {
     
     const container = document.getElementById('featuredProperties');
     container.innerHTML = '';
+
+    if (featured.length === 0) {
+        // Show empty state
+        container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <div class="empty-state-icon">🏠</div>
+                <h3 class="empty-state-title">No Properties Available Yet</h3>
+                <p>Check back soon for new listings!</p>
+            </div>
+        `;
+        return;
+    }
 
     featured.forEach(property => {
         container.appendChild(createPropertyCard(property));
