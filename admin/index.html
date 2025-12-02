@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Real Estate Simplified</title>
+    <link rel="stylesheet" href="../assets/css/shared.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🏠 Real Estate Simplified</h1>
+                <p>Admin Portal</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="loginEmail" required placeholder="admin@company.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <div class="alert alert-danger hidden" id="loginError"></div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+            </form>
+            <div class="login-footer">
+                <p>Demo Credentials:</p>
+                <p><strong>Admin:</strong> admin@company.com / admin123</p>
+                <p><a href="../customer/index.html">← Back to Customer Portal</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="layout hidden" id="appContainer">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">🏠 Admin Portal</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="#dashboard" class="active" data-page="dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+                <li><a href="#inquiries" data-page="inquiries"><span class="nav-icon">📧</span> Inquiries</a></li>
+                <li><a href="#calendar" data-page="calendar"><span class="nav-icon">📅</span> Calendar</a></li>
+                <li><a href="#properties" data-page="properties"><span class="nav-icon">🏠</span> Properties</a></li>
+                <li><a href="#agents" data-page="agents"><span class="nav-icon">👥</span> Agents</a></li>
+                <li><a href="#reports" data-page="reports"><span class="nav-icon">📈</span> Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-details">
+                        <span class="user-name" id="currentUserName">Admin</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-block mt-2" onclick="logout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboardPage">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="showAddPropertyModal()">+ Add Property</button>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--primary);">🏠</div>
+                        <div class="stat-value" id="statTotalProperties">0</div>
+                        <div class="stat-label">Total Properties</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">✅</div>
+                        <div class="stat-value" id="statSoldProperties">0</div>
+                        <div class="stat-label">Properties Sold</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">📧</div>
+                        <div class="stat-value" id="statPendingInquiries">0</div>
+                        <div class="stat-label">Pending Inquiries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--info);">📅</div>
+                        <div class="stat-value" id="statUpcomingAppointments">0</div>
+                        <div class="stat-label">Upcoming Viewings</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Recent Inquiries</h3>
+                            <a href="#inquiries" class="btn btn-sm btn-outline">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div id="recentInquiries"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Upcoming Appointments</h3>
+                            <a href="#calendar" class="btn btn-sm btn-outline">View Calendar</a>
+                        </div>
+                        <div class="card-body">
+                            <div id="upcomingAppointments"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inquiries Page -->
+            <div class="page" id="inquiriesPage">
+                <div class="page-header">
+                    <h1 class="page-title">Inquiries</h1>
+                    <div class="page-actions">
+                        <select class="form-control" id="inquiryStatusFilter" onchange="filterInquiries()">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="assigned">Assigned</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Customer</th>
+                                        <th>Property</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Assigned To</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inquiriesTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div class="page" id="calendarPage">
+                <div class="page-header">
+                    <h1 class="page-title">Shared Calendar</h1>
+                    <div class="page-actions">
+                        <select class="form-control" id="calendarAgentFilter" onchange="loadCalendar()">
+                            <option value="">All Agents</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="calendar" id="calendarContainer">
+                    <!-- Calendar will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Properties Page -->
+            <div class="page" id="propertiesPage">
+                <div class="page-header">
+                    <h1 class="page-title">Property Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="showAddPropertyModal()">+ Add Property</button>
+                    </div>
+                </div>
+                <div class="filters mb-3">
+                    <input type="text" class="form-control" id="propertySearch" placeholder="Search properties..." oninput="filterProperties()">
+                    <select class="form-control" id="propertyStatusFilter" onchange="filterProperties()">
+                        <option value="">All Status</option>
+                        <option value="available">Available</option>
+                        <option value="sold">Sold</option>
+                    </select>
+                </div>
+                <div class="property-grid" id="propertiesGrid"></div>
+            </div>
+
+            <!-- Agents Page -->
+            <div class="page" id="agentsPage">
+                <div class="page-header">
+                    <h1 class="page-title">Agent Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="showAddAgentModal()">+ Add Agent</button>
+                    </div>
+                </div>
+                <div class="agents-grid" id="agentsGrid"></div>
+            </div>
+
+            <!-- Reports Page -->
+            <div class="page" id="reportsPage">
+                <div class="page-header">
+                    <h1 class="page-title">Sales Reports</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary" onclick="exportSalesCSV()">📥 Export CSV</button>
+                    </div>
+                </div>
+                
+                <!-- Report Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">💰</div>
+                        <div class="stat-value" id="reportTotalSales">$0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--primary);">📊</div>
+                        <div class="stat-value" id="reportSalesCount">0</div>
+                        <div class="stat-label">Properties Sold</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">📈</div>
+                        <div class="stat-value" id="reportAvgPrice">$0</div>
+                        <div class="stat-label">Average Price</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--info);">🏆</div>
+                        <div class="stat-value" id="reportTotalCommission">$0</div>
+                        <div class="stat-label">Total Commission</div>
+                    </div>
+                </div>
+
+                <!-- Sales Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Sales History</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Property</th>
+                                        <th>Buyer</th>
+                                        <th>Agent</th>
+                                        <th>Price</th>
+                                        <th>Commission</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Property Modal -->
+    <div class="modal-overlay hidden" id="propertyModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3 id="propertyModalTitle">Add Property</h3>
+                <button class="modal-close" onclick="closePropertyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="propertyForm" onsubmit="saveProperty(event)">
+                    <input type="hidden" id="propertyId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Title *</label>
+                            <input type="text" class="form-control" id="propertyTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type *</label>
+                            <select class="form-control" id="propertyType" required>
+                                <option value="house">House</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="condo">Condo</option>
+                                <option value="townhouse">Townhouse</option>
+                                <option value="penthouse">Penthouse</option>
+                                <option value="studio">Studio</option>
+                                <option value="loft">Loft</option>
+                                <option value="cabin">Cabin</option>
+                                <option value="cottage">Cottage</option>
+                                <option value="estate">Estate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Price *</label>
+                            <input type="number" class="form-control" id="propertyPrice" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="propertyStatus">
+                                <option value="available">Available</option>
+                                <option value="sold">Sold</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Bedrooms *</label>
+                            <input type="number" class="form-control" id="propertyBedrooms" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bathrooms *</label>
+                            <input type="number" class="form-control" id="propertyBathrooms" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Area (sq ft) *</label>
+                            <input type="number" class="form-control" id="propertyArea" required min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Address *</label>
+                        <input type="text" class="form-control" id="propertyAddress" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" id="propertyCity" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State *</label>
+                            <input type="text" class="form-control" id="propertyState" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ZIP Code *</label>
+                            <input type="text" class="form-control" id="propertyZip" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="propertyDescription" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Features (comma-separated)</label>
+                        <input type="text" class="form-control" id="propertyFeatures" placeholder="Pool, Garage, Garden">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Photos</label>
+                        <input type="file" class="form-control" id="propertyPhotos" multiple accept="image/*" onchange="handlePhotoUpload(event)">
+                        <div class="photo-preview" id="photoPreview"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closePropertyModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Property</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Agent Modal -->
+    <div class="modal-overlay hidden" id="assignAgentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Assign Inquiry to Agent</h3>
+                <button class="modal-close" onclick="closeAssignModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="assignInquiryId">
+                <div class="form-group">
+                    <label class="form-label">Select Agent</label>
+                    <select class="form-control" id="assignAgentSelect" required>
+                        <option value="">Choose an agent...</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeAssignModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmAssignment()">Assign</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Agent Modal -->
+    <div class="modal-overlay hidden" id="agentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="agentModalTitle">Add Agent</h3>
+                <button class="modal-close" onclick="closeAgentModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="agentForm" onsubmit="saveAgent(event)">
+                    <input type="hidden" id="agentId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Name *</label>
+                        <input type="text" class="form-control" id="agentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="agentEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone *</label>
+                        <input type="tel" class="form-control" id="agentPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        <input type="password" class="form-control" id="agentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Specialization</label>
+                        <select class="form-control" id="agentSpecialization">
+                            <option value="Residential">Residential</option>
+                            <option value="Commercial">Commercial</option>
+                            <option value="Luxury">Luxury</option>
+                            <option value="Industrial">Industrial</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeAgentModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Agent</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mark as Sold Modal -->
+    <div class="modal-overlay hidden" id="markSoldModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Mark Property as Sold</h3>
+                <button class="modal-close" onclick="closeMarkSoldModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="markSoldForm" onsubmit="confirmMarkSold(event)">
+                    <input type="hidden" id="soldPropertyId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Buyer Name *</label>
+                        <input type="text" class="form-control" id="buyerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Buyer Email *</label>
+                        <input type="email" class="form-control" id="buyerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Buyer Phone *</label>
+                        <input type="tel" class="form-control" id="buyerPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sale Price *</label>
+                        <input type="number" class="form-control" id="salePrice" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Agent *</label>
+                        <select class="form-control" id="saleAgent" required>
+                            <option value="">Select agent...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sale Date *</label>
+                        <input type="date" class="form-control" id="saleDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="saleNotes" rows="2"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeMarkSoldModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">Confirm Sale</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Inquiry Modal -->
+    <div class="modal-overlay hidden" id="viewInquiryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Inquiry Details</h3>
+                <button class="modal-close" onclick="closeViewInquiryModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="viewInquiryContent">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/auth.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="../data/seed.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

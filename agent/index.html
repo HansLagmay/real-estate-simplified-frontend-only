@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Portal - Real Estate Simplified</title>
+    <link rel="stylesheet" href="../assets/css/shared.css">
+    <link rel="stylesheet" href="css/agent.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🏠 Real Estate Simplified</h1>
+                <p>Agent Portal</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="loginEmail" required placeholder="agent1@company.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <div class="alert alert-danger hidden" id="loginError"></div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+            </form>
+            <div class="login-footer">
+                <p>Demo Credentials:</p>
+                <p><strong>Agent 1:</strong> agent1@company.com / agent123</p>
+                <p><strong>Agent 2:</strong> agent2@company.com / agent123</p>
+                <p><a href="../customer/index.html">← Back to Customer Portal</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="layout hidden" id="appContainer">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">🏠 Agent Portal</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="#dashboard" class="active" data-page="dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+                <li><a href="#inquiries" data-page="inquiries"><span class="nav-icon">📧</span> My Inquiries</a></li>
+                <li><a href="#calendar" data-page="calendar"><span class="nav-icon">📅</span> Shared Calendar</a></li>
+                <li><a href="#sales" data-page="sales"><span class="nav-icon">💰</span> My Sales</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-details">
+                        <span class="user-name" id="currentUserName">Agent</span>
+                        <span class="user-role">Sales Agent</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-block mt-2" onclick="logout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboardPage">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">📧</div>
+                        <div class="stat-value" id="statMyInquiries">0</div>
+                        <div class="stat-label">My Inquiries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--primary);">📅</div>
+                        <div class="stat-value" id="statMyAppointments">0</div>
+                        <div class="stat-label">Upcoming Viewings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">✅</div>
+                        <div class="stat-value" id="statCompletedViewings">0</div>
+                        <div class="stat-label">Completed Viewings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--info);">💰</div>
+                        <div class="stat-value" id="statMySales">0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>My Recent Inquiries</h3>
+                            <a href="#inquiries" class="btn btn-sm btn-outline">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div id="recentInquiries"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Today's Schedule</h3>
+                            <a href="#calendar" class="btn btn-sm btn-outline">View Calendar</a>
+                        </div>
+                        <div class="card-body">
+                            <div id="todaySchedule"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Inquiries Page -->
+            <div class="page" id="inquiriesPage">
+                <div class="page-header">
+                    <h1 class="page-title">My Assigned Inquiries</h1>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Customer</th>
+                                        <th>Contact</th>
+                                        <th>Property</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inquiriesTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div class="page" id="calendarPage">
+                <div class="page-header">
+                    <h1 class="page-title">Shared Calendar</h1>
+                    <div class="page-actions">
+                        <select class="form-control" id="calendarAgentFilter" onchange="loadCalendar()">
+                            <option value="">All Agents</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="text-muted mb-3">View all agents' appointments. Conflict detection prevents double-booking properties.</p>
+                <div class="calendar" id="calendarContainer">
+                    <!-- Calendar will be rendered here -->
+                </div>
+            </div>
+
+            <!-- My Sales Page -->
+            <div class="page" id="salesPage">
+                <div class="page-header">
+                    <h1 class="page-title">My Sales</h1>
+                </div>
+                
+                <!-- Sales Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">💰</div>
+                        <div class="stat-value" id="myTotalSales">$0</div>
+                        <div class="stat-label">Total Sales Value</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--primary);">🏠</div>
+                        <div class="stat-value" id="myPropertiesSold">0</div>
+                        <div class="stat-label">Properties Sold</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--info);">💵</div>
+                        <div class="stat-value" id="myTotalCommission">$0</div>
+                        <div class="stat-label">Total Commission</div>
+                    </div>
+                </div>
+
+                <!-- Sales Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Sales History</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Property</th>
+                                        <th>Buyer</th>
+                                        <th>Sale Price</th>
+                                        <th>Commission</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- View Inquiry Modal -->
+    <div class="modal-overlay hidden" id="viewInquiryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Inquiry Details</h3>
+                <button class="modal-close" onclick="closeViewInquiryModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="viewInquiryContent">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Viewing Modal -->
+    <div class="modal-overlay hidden" id="scheduleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Schedule Property Viewing</h3>
+                <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm" onsubmit="confirmSchedule(event)">
+                    <input type="hidden" id="scheduleInquiryId">
+                    <input type="hidden" id="schedulePropertyId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Property</label>
+                        <input type="text" class="form-control" id="schedulePropertyName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Customer</label>
+                        <input type="text" class="form-control" id="scheduleCustomerName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" id="scheduleDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time *</label>
+                        <select class="form-control" id="scheduleTime" required>
+                            <option value="">Select time...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="scheduleNotes" rows="3" placeholder="Any additional notes..."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-danger hidden" id="scheduleError"></div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Schedule Viewing</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Appointment Modal -->
+    <div class="modal-overlay hidden" id="viewAppointmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Appointment Details</h3>
+                <button class="modal-close" onclick="closeViewAppointmentModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="viewAppointmentContent">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer" id="viewAppointmentActions">
+                <!-- Actions loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/auth.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="../data/seed.js"></script>
+    <script src="js/agent.js"></script>
+</body>
+</html>
