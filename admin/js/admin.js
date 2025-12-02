@@ -968,7 +968,7 @@ function clearAllData() {
     localStorage.setItem('realestate_inquiries', JSON.stringify([]));
     localStorage.setItem('realestate_appointments', JSON.stringify([]));
     localStorage.setItem('realestate_sales', JSON.stringify([]));
-    localStorage.setItem('realestate_photos', JSON.stringify({}));
+    localStorage.setItem('realestate_photos', JSON.stringify([]));
     
     Utils.showNotification('🗑️ All data cleared successfully!', 'success');
     location.reload();
