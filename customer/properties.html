@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Properties - Real Estate Simplified</title>
+    <link rel="stylesheet" href="../assets/css/shared.css">
+    <link rel="stylesheet" href="css/customer.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="navbar-brand">🏠 Real Estate Simplified</a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="properties.html" class="active">Properties</a></li>
+                <li><a href="../admin/index.html">Admin Portal</a></li>
+                <li><a href="../agent/index.html">Agent Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-banner">
+        <div class="container">
+            <h1>Browse Properties</h1>
+            <p>Find your perfect home from our extensive listings</p>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="section">
+        <div class="container">
+            <div class="filters-bar">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Search</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search properties...">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select class="form-control" id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="house">House</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="condo">Condo</option>
+                            <option value="townhouse">Townhouse</option>
+                            <option value="penthouse">Penthouse</option>
+                            <option value="studio">Studio</option>
+                            <option value="loft">Loft</option>
+                            <option value="cabin">Cabin</option>
+                            <option value="cottage">Cottage</option>
+                            <option value="estate">Estate</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Price Range</label>
+                        <select class="form-control" id="priceFilter">
+                            <option value="">Any Price</option>
+                            <option value="0-300000">Under $300,000</option>
+                            <option value="300000-500000">$300,000 - $500,000</option>
+                            <option value="500000-800000">$500,000 - $800,000</option>
+                            <option value="800000-1000000">$800,000 - $1,000,000</option>
+                            <option value="1000000-999999999">$1,000,000+</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Bedrooms</label>
+                        <select class="form-control" id="bedroomsFilter">
+                            <option value="">Any</option>
+                            <option value="0">Studio</option>
+                            <option value="1">1+</option>
+                            <option value="2">2+</option>
+                            <option value="3">3+</option>
+                            <option value="4">4+</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="form-control" id="statusFilter">
+                            <option value="">All</option>
+                            <option value="available">Available</option>
+                            <option value="sold">Sold</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Count -->
+            <div class="results-header">
+                <span id="resultsCount">0 properties found</span>
+                <div class="sort-group">
+                    <label>Sort by:</label>
+                    <select class="form-control" id="sortSelect" onchange="applyFilters()">
+                        <option value="newest">Newest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="bedrooms">Bedrooms</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Properties Grid -->
+            <div class="property-grid" id="propertiesGrid">
+                <!-- Properties will be loaded dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">🏠</div>
+                <h3 class="empty-state-title">No properties found</h3>
+                <p>Try adjusting your filters or search terms</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>🏠 Real Estate Simplified</h3>
+                    <p>Making real estate simple for everyone.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="properties.html">Properties</a></li>
+                        <li><a href="../admin/index.html">Admin Portal</a></li>
+                        <li><a href="../agent/index.html">Agent Portal</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p>📍 123 Real Estate Ave, NY 10001</p>
+                    <p>📞 (555) 123-4567</p>
+                    <p>✉️ info@realestate.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Real Estate Simplified. Frontend-only demo application.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="../data/seed.js"></script>
+    <script src="js/properties.js"></script>
+</body>
+</html>

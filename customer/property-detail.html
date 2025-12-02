@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details - Real Estate Simplified</title>
+    <link rel="stylesheet" href="../assets/css/shared.css">
+    <link rel="stylesheet" href="css/customer.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="navbar-brand">🏠 Real Estate Simplified</a>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="properties.html" class="active">Properties</a></li>
+                <li><a href="../admin/index.html">Admin Portal</a></li>
+                <li><a href="../agent/index.html">Agent Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Property Details -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="index.html">Home</a> &gt;
+            <a href="properties.html">Properties</a> &gt;
+            <span id="propertyBreadcrumb">Property Details</span>
+        </nav>
+
+        <!-- Property Content -->
+        <div class="property-detail" id="propertyDetail">
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inquiry Modal -->
+    <div class="modal-overlay hidden" id="inquiryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Send Inquiry</h3>
+                <button class="modal-close" onclick="closeInquiryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="inquiryForm" onsubmit="submitInquiry(event)">
+                    <input type="hidden" id="inquiryPropertyId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="inquiryName" required placeholder="Enter your full name">
+                        <div class="invalid-feedback" id="nameError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" id="inquiryEmail" required placeholder="Enter your email">
+                        <div class="invalid-feedback" id="emailError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-control" id="inquiryPhone" required placeholder="Enter your phone number">
+                        <div class="invalid-feedback" id="phoneError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message *</label>
+                        <textarea class="form-control" id="inquiryMessage" required placeholder="Tell us about your interest in this property..."></textarea>
+                        <div class="invalid-feedback" id="messageError"></div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeInquiryModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send Inquiry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay hidden" id="successModal">
+        <div class="modal">
+            <div class="modal-body text-center">
+                <div class="success-icon">✅</div>
+                <h3>Inquiry Sent Successfully!</h3>
+                <p>Thank you for your interest. One of our agents will contact you shortly.</p>
+                <button class="btn btn-primary mt-3" onclick="closeSuccessModal()">Continue Browsing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>🏠 Real Estate Simplified</h3>
+                    <p>Making real estate simple for everyone.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="properties.html">Properties</a></li>
+                        <li><a href="../admin/index.html">Admin Portal</a></li>
+                        <li><a href="../agent/index.html">Agent Portal</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p>📍 123 Real Estate Ave, NY 10001</p>
+                    <p>📞 (555) 123-4567</p>
+                    <p>✉️ info@realestate.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Real Estate Simplified. Frontend-only demo application.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="../data/seed.js"></script>
+    <script src="js/property-detail.js"></script>
+</body>
+</html>
