@@ -569,19 +569,25 @@ function closePropertyModal() {
 function handlePhotoUpload(event) {
     const files = event.target.files;
     
-    Array.from(files).forEach(async file => {
-        try {
-            const base64 = await Utils.readFileAsBase64(file);
-            uploadedPhotos.push({
-                id: Storage.generateId('photo'),
-                data: base64,
-                name: file.name,
-                isNew: true
-            });
-            renderPhotoPreview();
-        } catch (error) {
-            console.error('Error uploading photo:', error);
-        }
+    Promise.all(
+        Array.from(files).map(async file => {
+            try {
+                const base64 = await Utils.readFileAsBase64(file);
+                return {
+                    id: Storage.generateId('photo'),
+                    data: base64,
+                    name: file.name,
+                    isNew: true
+                };
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+                return null;
+            }
+        })
+    ).then(results => {
+        const validPhotos = results.filter(photo => photo !== null);
+        uploadedPhotos.push(...validPhotos);
+        renderPhotoPreview();
     });
 }
 

@@ -350,7 +350,7 @@ const Storage = {
 
     // Utility
     generateId(prefix) {
-        return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     },
 
     // Clear all data (for testing)
